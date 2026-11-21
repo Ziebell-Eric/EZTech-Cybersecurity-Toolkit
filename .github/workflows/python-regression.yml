@@ -1,0 +1,31 @@
+name: Defensive toolkit tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-regression:
+    name: Python regression tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check Python version
+        run: python3 --version
+
+      - name: Run offline regression suite
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+          PYTHONNOUSERSITE: "1"
+        run: python3 -m unittest discover -s tests -p 'test_*.py' -v
