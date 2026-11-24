@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -u
 
-OUT="linux-security-audit-$(date +%Y%m%d-%H%M%S).txt"
+# Reports contain sensitive host, account and network information.
+# Use an exclusive, randomly named file with owner-only permissions.
+umask 077
+OUT=$(mktemp "./linux-security-audit-$(date +%Y%m%d-%H%M%S).XXXXXXXX.txt") || {
+  echo "Unable to create a private audit report" >&2
+  exit 1
+}
 {
   echo "EZTech Linux Security Audit"
   echo "Generated: $(date -Is)"
@@ -35,6 +41,9 @@ OUT="linux-security-audit-$(date +%Y%m%d-%H%M%S).txt"
   echo "== Recent package updates =="
   command -v apt >/dev/null && apt list --upgradable 2>/dev/null
   command -v dnf >/dev/null && dnf check-update 2>/dev/null || true
-} > "$OUT"
+} > "$OUT" || {
+  echo "Audit report may be incomplete: $OUT" >&2
+  exit 1
+}
 
 echo "Security audit written to $OUT"
