@@ -23,13 +23,19 @@ These scripts are designed to be read-only or minimally invasive by default. The
 ## Quick examples
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\windows\windows-security-audit.ps1
+powershell -NoProfile -File .\windows\windows-security-audit.ps1
 ```
 
 ```bash
 python3 incident-response/file-integrity.py /etc --output baseline.json
 python3 network/tls-audit.py example.com
 ```
+
+## Handling audit output
+
+Audit reports and integrity baselines can contain account names, internal addresses, file paths, and other sensitive inventory. Store them in an access-controlled directory outside the repository; do not commit real customer or production reports. On Linux, set `umask 077` before running tools that write reports. On Windows, use a directory with restricted NTFS permissions. Review and redact reports before sharing them, and retain only what is necessary for the authorized assessment.
+
+Run scripts without elevated privileges first. Elevate only when a documented check requires it and the assessment scope permits it. Review downloaded scripts before execution and follow your organization's PowerShell execution policy; do not bypass it as a routine prerequisite.
 
 ## Contributions
 
